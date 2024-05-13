@@ -81,11 +81,11 @@ Sidebar.prototype.init = function()
 {
 	var dir = STENCIL_PATH;
 	
-	this.addSearchPalette(true);
-	this.addGeneralPalette(true);
-	this.addMiscPalette(false);
-	this.addAdvancedPalette(false);
-	this.addBasicPalette(dir);
+	// this.addSearchPalette(true);
+	// this.addGeneralPalette(true);
+	// this.addMiscPalette(false);
+	// this.addAdvancedPalette(false);
+	// this.addBasicPalette(dir);
 	
 	this.setCurrentSearchEntryLibrary('arrows');
 	this.addStencilPalette('arrows', mxResources.get('arrows'), dir + '/arrows.xml',

@@ -145,22 +145,11 @@
 
           var edge_relation = doc.createElement("Scheduling");
           edge_relation.setAttribute("duration", null);
+          edge_relation.setAttribute("condition", null);
 
           // Adds cells to the model in a single step
           graph.getModel().beginUpdate();
           try {
-            // var v1 = graph.insertVertex(parent, null, "Hello,", 20, 20, 80, 30);
-            // var v2 = graph.insertVertex(
-            //   parent,
-            //   null,
-            //   "World!",
-            //   200,
-            //   150,
-            //   80,
-            //   30
-            // );
-            // var e1 = graph.insertEdge(parent, null, "", v1, v2);
-
             var v1 = graph.insertVertex(parent, null, person1, 40, 40, 80, 30);
             var v2 = graph.insertVertex(
               parent,
@@ -172,22 +161,13 @@
               30
             );
             var e1 = graph.insertEdge(parent, null, edge_relation, v1, v2);
+
           } finally {
             // Updates the display
             graph.getModel().endUpdate();
           }
 
-          document.body.appendChild(
-            mxUtils.button("Zoom In", function () {
-              graph.zoomIn();
-            })
-          );
-
-          document.body.appendChild(
-            mxUtils.button("Zoom Out", function () {
-              graph.zoomOut();
-            })
-          );
+          
 
           // Undo/redo
           var undoManager = new mxUndoManager();
@@ -264,7 +244,7 @@
                 return firstName;
               } else if (cell.value.nodeName.toLowerCase() == "scheduling") {
                 // return " (Duration " + cell.getAttribute("duration", "") + ")";
-                return "";
+                return cell.getAttribute("duration", "");
               }
             }
 
@@ -276,8 +256,8 @@
           graph.cellLabelChanged = function (cell, newValue, autoSize) {
             if (
               mxUtils.isNode(cell.value)
-              //   &&
-              //   cell.value.nodeName.toLowerCase() == "person"
+                &&
+                cell.value.nodeName.toLowerCase() == "person"
             ) {
               var pos = newValue.indexOf(" ");
 
@@ -374,6 +354,49 @@
                 conditionCheckbox.checked = false;
               }
 
+              // Check the localStorage for the durationCheckbox state
+              if (localStorage.getItem("durationChecked") === "true") {
+                durationCheckbox.checked = true;
+                edge_relation.setAttribute("duration", "true");
+              } else {
+                durationCheckbox.checked = false;
+              }
+
+              mxEvent.addListener(durationCheckbox, "change", function (evt) {
+                if (durationCheckbox.checked) {
+                  console.log("Duration checked");
+                  edge_relation.setAttribute("duration", "true");
+
+                  // Save the checkbox state
+                  localStorage.setItem("durationChecked", "true");
+
+                  graph.getModel().beginUpdate();
+                  try {
+                    // Add a tilde sign to the label
+                    edge_relation.setAttribute("duration", "||");
+            
+                  } finally {
+                    graph.getModel().endUpdate();
+                  }
+
+                  // Enable editing the duration in the box
+                  durationCheckbox.disabled = false;
+                } else {
+                  console.log("Duration unchecked");
+
+                  // Save the checkbox state
+                  localStorage.setItem("durationChecked", "false");
+
+                  graph.getModel().beginUpdate();
+                  try {
+                    // Remove the tilde sign from the label
+                   
+                  } finally {
+                    graph.getModel().endUpdate();
+                  }
+                }
+              });
+
               mxEvent.addListener(conditionCheckbox, "change", function (evt) {
                 if (conditionCheckbox.checked) {
                   console.log("Condition checked");
@@ -386,6 +409,7 @@
                   graph.getModel().beginUpdate();
                   try {
                     graph.setCellStyle(newStyle, [cell]);
+                    console.log(graph.getModel());
                     // graph.getModel().setValue(cell, '||'); // Set the label to "||"
                   } finally {
                     graph.getModel().endUpdate();
